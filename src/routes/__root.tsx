@@ -31,20 +31,26 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "NyayaLens — Protect what your hands create" },
+      { title: "NyayaLens" },
       {
         name: "description",
         content:
           "AI-powered IP protection for Indian artisans. Register your work, detect copies, and generate legal complaints in minutes.",
       },
       { name: "author", content: "NyayaLens" },
-      { property: "og:title", content: "NyayaLens — Protect what your hands create" },
+      { property: "og:title", content: "NyayaLens" },
       {
         property: "og:description",
         content: "AI-powered IP protection for Indian artisans.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "NyayaLens" },
+      { name: "description", content: "Artisan Shield protects artisan creations with AI-powered digital proof, copy detection, and automated legal complaints." },
+      { property: "og:description", content: "Artisan Shield protects artisan creations with AI-powered digital proof, copy detection, and automated legal complaints." },
+      { name: "twitter:description", content: "Artisan Shield protects artisan creations with AI-powered digital proof, copy detection, and automated legal complaints." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/483cfd2a-2fa5-446f-a738-840e811e1f26/id-preview-cf4d4dd6--1b5f41b9-d1ca-4acd-b8c4-61fa2b9f90df.lovable.app-1777394503962.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/483cfd2a-2fa5-446f-a738-840e811e1f26/id-preview-cf4d4dd6--1b5f41b9-d1ca-4acd-b8c4-61fa2b9f90df.lovable.app-1777394503962.png" },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),
