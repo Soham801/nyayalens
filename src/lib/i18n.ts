@@ -201,9 +201,9 @@ export type StringKey = keyof typeof en;
 
 // Translation table — each language overrides keys it has translated.
 // Untranslated keys gracefully fall back to English.
-type Partial<T> = { [K in keyof T]?: T[K] };
+type StringTable = { [K in StringKey]?: string };
 
-const dict: Record<Lang, Partial<typeof en>> = {
+const dict: Record<Lang, StringTable> = {
   en,
 
   hi: {
