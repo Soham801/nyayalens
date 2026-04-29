@@ -114,25 +114,25 @@ function CasesPage() {
         <div className="mb-6">
           <h1 className="font-serif text-4xl text-foreground">{t(lang, "cases")}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {works.length} works · {scans.length} scans · {complaints.length} complaints
+            {t(lang, "casesSummary", { works: works.length, scans: scans.length, complaints: complaints.length })}
           </p>
         </div>
 
         <Tabs defaultValue="works">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="works" className="gap-1.5">
-              <Camera className="h-3.5 w-3.5" /> Works
+              <Camera className="h-3.5 w-3.5" /> {t(lang, "works")}
             </TabsTrigger>
             <TabsTrigger value="scans" className="gap-1.5">
-              <ScanSearch className="h-3.5 w-3.5" /> Scans
+              <ScanSearch className="h-3.5 w-3.5" /> {t(lang, "scans")}
             </TabsTrigger>
             <TabsTrigger value="complaints" className="gap-1.5">
-              <FileText className="h-3.5 w-3.5" /> Complaints
+              <FileText className="h-3.5 w-3.5" /> {t(lang, "complaints")}
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="works" className="mt-6 space-y-3">
-            {works.length === 0 && <Empty msg="No works yet. Register your first creation." cta="/register" ctaLabel="Register a work" />}
+            {works.length === 0 && <Empty msg={t(lang, "noWorks")} cta="/register" ctaLabel={t(lang, "registerAWork")} />}
             {works.map((w) => (
               <div
                 key={w.id}
@@ -164,7 +164,7 @@ function CasesPage() {
           </TabsContent>
 
           <TabsContent value="scans" className="mt-6 space-y-3">
-            {scans.length === 0 && <Empty msg="No scans yet." cta="/scan" ctaLabel="Scan an image" />}
+            {scans.length === 0 && <Empty msg={t(lang, "noScans")} cta="/scan" ctaLabel={t(lang, "scanAnImage")} />}
             {scans.map((s) => {
               const high = s.similarity_score >= 70;
               return (
@@ -179,7 +179,7 @@ function CasesPage() {
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <h3 className="font-serif text-lg text-foreground">
-                            vs {s.works?.title || "—"}
+                            {t(lang, "vs")} {s.works?.title || "—"}
                           </h3>
                           <p className="text-xs text-muted-foreground">{formatDateTime(s.created_at)}</p>
                         </div>
@@ -200,13 +200,13 @@ function CasesPage() {
           </TabsContent>
 
           <TabsContent value="complaints" className="mt-6 space-y-3">
-            {complaints.length === 0 && <Empty msg="No complaints filed." cta="/scan" ctaLabel="Scan to detect copies" />}
+            {complaints.length === 0 && <Empty msg={t(lang, "noComplaints")} cta="/scan" ctaLabel={t(lang, "scanToDetect")} />}
             {complaints.map((c) => (
               <div key={c.id} className="rounded-xl border border-border bg-card p-4 shadow-card">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <h3 className="font-serif text-lg text-foreground">
-                      Complaint · {c.works?.certificate_id || "—"}
+                      {t(lang, "complaint")} · {c.works?.certificate_id || "—"}
                     </h3>
                     <p className="text-xs text-muted-foreground">{formatDateTime(c.created_at)}</p>
                   </div>
@@ -223,18 +223,18 @@ function CasesPage() {
                 <p className="mt-2 line-clamp-3 text-xs text-muted-foreground">{c.complaint_text}</p>
                 <div className="mt-3 flex gap-2">
                   <Button size="sm" variant="outline" onClick={() => downloadComp(c)} className="h-7 gap-1 text-xs">
-                    <Download className="h-3 w-3" /> Download
+                    <Download className="h-3 w-3" /> {t(lang, "download")}
                   </Button>
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={() => {
                       navigator.clipboard.writeText(c.complaint_text);
-                      toast.success("Copied");
+                      toast.success(t(lang, "copied"));
                     }}
                     className="h-7 text-xs"
                   >
-                    Copy text
+                    {t(lang, "copyText")}
                   </Button>
                 </div>
               </div>

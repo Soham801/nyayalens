@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data } = await supabase.from("profiles").select("*").eq("id", uid).maybeSingle();
     if (data) {
       setProfile(data as Profile);
-      if (data.language && (data.language === "en" || data.language === "hi")) {
+      if (data.language) {
         setLangState(data.language as Lang);
       }
     }

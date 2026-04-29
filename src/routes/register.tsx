@@ -45,31 +45,29 @@ function RegisterWork() {
 
   const detectLocation = () => {
     if (!navigator.geolocation) {
-      toast.error("Geolocation not supported");
+      toast.error(t(lang, "geolocationUnsupported"));
       return;
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setLocation(`${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`);
-        toast.success("Location captured");
+        toast.success(t(lang, "locationCaptured"));
       },
-      () => toast.error("Could not get location")
+      () => toast.error(t(lang, "locationFailed"))
     );
   };
 
   const submit = async () => {
     if (!user || !file || !title.trim()) {
-      toast.error("Please add an image and title");
+      toast.error(t(lang, "needImageTitle"));
       return;
     }
     setBusy(true);
     try {
-      // 1. Hash
-      setStage("Hashing image…");
+      setStage(t(lang, "hashing"));
       const phash = await simplePerceptualHash(file);
 
-      // 2. Upload
-      setStage("Uploading…");
+      setStage(t(lang, "uploading"));
       const ext = file.name.split(".").pop() || "jpg";
       const path = `${user.id}/${Date.now()}.${ext}`;
       const { error: upErr } = await supabase.storage
@@ -79,8 +77,7 @@ function RegisterWork() {
       const { data: pub } = supabase.storage.from("artisan-works").getPublicUrl(path);
       const imageUrl = pub.publicUrl;
 
-      // 3. AI description
-      setStage("Analyzing with AI…");
+      setStage(t(lang, "analyzing"));
       let description = "";
       let tags: string[] = [];
       try {
@@ -95,8 +92,7 @@ function RegisterWork() {
         description = "Artisan creation. (AI description temporarily unavailable.)";
       }
 
-      // 4. Insert work
-      setStage("Issuing certificate…");
+      setStage(t(lang, "issuing"));
       const certificateId = generateCertificateId();
       const { data: work, error: insErr } = await supabase
         .from("works")
@@ -117,10 +113,10 @@ function RegisterWork() {
       if (insErr) throw insErr;
 
       setCreated(work as CreatedWork);
-      toast.success("Certificate issued!");
+      toast.success(t(lang, "certificateIssued"));
     } catch (e: any) {
       console.error(e);
-      toast.error(e.message || "Failed to register work");
+      toast.error(e.message || t(lang, "registerFailed"));
     } finally {
       setBusy(false);
       setStage("");
@@ -150,10 +146,9 @@ function RegisterWork() {
         <main className="mx-auto max-w-2xl px-4 py-10">
           <div className="mb-6 flex items-center gap-2 text-success">
             <CheckCircle2 className="h-5 w-5" />
-            <span className="text-sm font-medium">Work registered successfully</span>
+            <span className="text-sm font-medium">{t(lang, "registeredOk")}</span>
           </div>
 
-          {/* Certificate preview card */}
           <div className="relative overflow-hidden rounded-2xl border-2 border-primary/30 bg-gradient-warm p-8 shadow-warm">
             <div className="seal-stamp absolute -right-4 -top-4 flex h-24 w-24 rotate-12 flex-col items-center justify-center rounded-full text-center">
               <span className="font-serif text-[10px] italic text-primary">verified</span>
@@ -178,7 +173,7 @@ function RegisterWork() {
             {created.ai_description && (
               <div className="mt-5 rounded-lg bg-card/60 p-4">
                 <div className="mb-1 flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-primary">
-                  <Sparkles className="h-3 w-3" /> AI Description
+                  <Sparkles className="h-3 w-3" /> {t(lang, "aiDescription")}
                 </div>
                 <p className="text-sm leading-relaxed text-foreground">{created.ai_description}</p>
                 {created.ai_tags && created.ai_tags.length > 0 && (
@@ -198,11 +193,11 @@ function RegisterWork() {
 
             <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
               <div>
-                <span className="text-muted-foreground">Owner: </span>
+                <span className="text-muted-foreground">{t(lang, "owner")}: </span>
                 <span className="font-medium">{profile?.name}</span>
               </div>
               <div>
-                <span className="text-muted-foreground">Date: </span>
+                <span className="text-muted-foreground">{t(lang, "date")}: </span>
                 <span className="font-medium">
                   {new Date(created.created_at).toLocaleDateString("en-IN")}
                 </span>
@@ -215,7 +210,7 @@ function RegisterWork() {
               <Download className="h-4 w-4" /> {t(lang, "download")}
             </Button>
             <Button asChild variant="outline" size="lg" className="flex-1">
-              <Link to="/cases">View My Cases</Link>
+              <Link to="/cases">{t(lang, "viewMyCases")}</Link>
             </Button>
           </div>
         </main>
@@ -237,9 +232,7 @@ function RegisterWork() {
 
         <div className="mb-6">
           <h1 className="font-serif text-4xl text-foreground">{t(lang, "register")}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Photograph your work, and we'll issue a tamper-proof certificate.
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">{t(lang, "registerSubtitle")}</p>
         </div>
 
         <div className="space-y-6 rounded-2xl border border-border bg-card p-6 shadow-card">
@@ -276,7 +269,7 @@ function RegisterWork() {
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Madhubani, Bihar"
               />
-              <Button type="button" variant="outline" size="icon" onClick={detectLocation}>
+              <Button type="button" variant="outline" size="icon" onClick={detectLocation} aria-label={t(lang, "detectLocation")}>
                 <MapPin className="h-4 w-4" />
               </Button>
             </div>
@@ -294,7 +287,7 @@ function RegisterWork() {
                 {stage || t(lang, "analyzing")}
               </>
             ) : (
-              "Issue Certificate"
+              t(lang, "issueCertificate")
             )}
           </Button>
         </div>

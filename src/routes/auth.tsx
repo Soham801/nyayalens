@@ -9,13 +9,14 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { t } from "@/lib/i18n";
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
 function AuthPage() {
-  const { user } = useAuth();
+  const { user, lang } = useAuth();
   const nav = useNavigate();
   const [tab, setTab] = useState<"signin" | "signup">("signup");
   const [email, setEmail] = useState("");
@@ -31,7 +32,7 @@ function AuthPage() {
   const handleSignUp = async (e: FormEvent) => {
     e.preventDefault();
     if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
+      toast.error(t(lang, "passwordMin"));
       return;
     }
     setBusy(true);
@@ -48,7 +49,7 @@ function AuthPage() {
       toast.error(error.message);
       return;
     }
-    toast.success("Account created! Setting up your profile…");
+    toast.success(t(lang, "accountCreated"));
     nav({ to: "/onboarding" });
   };
 
@@ -61,7 +62,7 @@ function AuthPage() {
       toast.error(error.message);
       return;
     }
-    toast.success("Welcome back!");
+    toast.success(t(lang, "welcomeBack"));
     nav({ to: "/" });
   };
 
@@ -70,23 +71,21 @@ function AuthPage() {
       <TopBar />
       <main className="mx-auto flex max-w-md flex-col px-4 pt-12">
         <div className="mb-8 text-center">
-          <h1 className="font-serif text-4xl text-foreground">Welcome to NyayaLens</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Protect your craft. Prove your creation.
-          </p>
+          <h1 className="font-serif text-4xl text-foreground">{t(lang, "welcomeNyayaLens")}</h1>
+          <p className="mt-2 text-sm text-muted-foreground">{t(lang, "authSubtitle")}</p>
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
           <Tabs value={tab} onValueChange={(v) => setTab(v as "signin" | "signup")}>
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
+              <TabsTrigger value="signup">{t(lang, "signUp")}</TabsTrigger>
+              <TabsTrigger value="signin">{t(lang, "signIn")}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4 pt-4">
                 <div>
-                  <Label htmlFor="name">Your Name</Label>
+                  <Label htmlFor="name">{t(lang, "name")}</Label>
                   <Input
                     id="name"
                     required
@@ -96,7 +95,7 @@ function AuthPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="email-up">Email</Label>
+                  <Label htmlFor="email-up">{t(lang, "email")}</Label>
                   <Input
                     id="email-up"
                     type="email"
@@ -106,7 +105,7 @@ function AuthPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="pw-up">Password</Label>
+                  <Label htmlFor="pw-up">{t(lang, "password")}</Label>
                   <Input
                     id="pw-up"
                     type="password"
@@ -118,7 +117,7 @@ function AuthPage() {
                 </div>
                 <Button type="submit" className="w-full" size="lg" disabled={busy}>
                   {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Create account
+                  {t(lang, "createAccount")}
                 </Button>
               </form>
             </TabsContent>
@@ -126,7 +125,7 @@ function AuthPage() {
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4 pt-4">
                 <div>
-                  <Label htmlFor="email-in">Email</Label>
+                  <Label htmlFor="email-in">{t(lang, "email")}</Label>
                   <Input
                     id="email-in"
                     type="email"
@@ -136,7 +135,7 @@ function AuthPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="pw-in">Password</Label>
+                  <Label htmlFor="pw-in">{t(lang, "password")}</Label>
                   <Input
                     id="pw-in"
                     type="password"
@@ -147,7 +146,7 @@ function AuthPage() {
                 </div>
                 <Button type="submit" className="w-full" size="lg" disabled={busy}>
                   {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Sign In
+                  {t(lang, "signIn")}
                 </Button>
               </form>
             </TabsContent>

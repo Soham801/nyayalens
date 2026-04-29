@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { t } from "@/lib/i18n";
 
 const CRAFTS = [
   "Madhubani painting",
@@ -37,7 +38,7 @@ export const Route = createFileRoute("/onboarding")({
 });
 
 function Onboarding() {
-  const { user, profile, lang, setLang, refreshProfile, loading } = useAuth();
+  const { user, profile, lang, refreshProfile, loading } = useAuth();
   const nav = useNavigate();
   const [name, setName] = useState("");
   const [craft, setCraft] = useState("");
@@ -63,7 +64,7 @@ function Onboarding() {
       return;
     }
     await refreshProfile();
-    toast.success("Profile saved");
+    toast.success(t(lang, "profileSaved"));
     nav({ to: "/" });
   };
 
@@ -72,10 +73,8 @@ function Onboarding() {
       <TopBar />
       <main className="mx-auto max-w-md px-4 pt-12">
         <div className="mb-8">
-          <h1 className="font-serif text-4xl text-foreground">Tell us about your craft</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            We'll use this to personalize your certificates and complaints.
-          </p>
+          <h1 className="font-serif text-4xl text-foreground">{t(lang, "onbTitle")}</h1>
+          <p className="mt-2 text-sm text-muted-foreground">{t(lang, "onbSubtitle")}</p>
         </div>
 
         <form
@@ -83,7 +82,7 @@ function Onboarding() {
           className="space-y-5 rounded-2xl border border-border bg-card p-6 shadow-card"
         >
           <div>
-            <Label htmlFor="name">Your Name</Label>
+            <Label htmlFor="name">{t(lang, "name")}</Label>
             <Input
               id="name"
               required
@@ -94,10 +93,10 @@ function Onboarding() {
           </div>
 
           <div>
-            <Label>Craft Type</Label>
+            <Label>{t(lang, "craftType")}</Label>
             <Select value={craft} onValueChange={setCraft} required>
               <SelectTrigger>
-                <SelectValue placeholder="Select your craft" />
+                <SelectValue placeholder={t(lang, "selectCraft")} />
               </SelectTrigger>
               <SelectContent>
                 {CRAFTS.map((c) => (
@@ -110,38 +109,15 @@ function Onboarding() {
           </div>
 
           <div>
-            <Label>Language / भाषा</Label>
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setLang("en")}
-                className={`rounded-lg border px-4 py-3 text-left transition ${
-                  lang === "en"
-                    ? "border-primary bg-primary/10"
-                    : "border-border bg-background hover:border-primary/40"
-                }`}
-              >
-                <div className="font-medium">English</div>
-                <div className="text-xs text-muted-foreground">Default</div>
-              </button>
-              <button
-                type="button"
-                onClick={() => setLang("hi")}
-                className={`rounded-lg border px-4 py-3 text-left transition ${
-                  lang === "hi"
-                    ? "border-primary bg-primary/10"
-                    : "border-border bg-background hover:border-primary/40"
-                }`}
-              >
-                <div className="font-medium">हिंदी</div>
-                <div className="text-xs text-muted-foreground">Hindi</div>
-              </button>
-            </div>
+            <Label>{t(lang, "language")}</Label>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {t(lang, "searchLanguage")} — {t(lang, "language")}
+            </p>
           </div>
 
           <Button type="submit" className="w-full" size="lg" disabled={busy || !name || !craft}>
             {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Continue
+            {t(lang, "continue")}
           </Button>
         </form>
       </main>
