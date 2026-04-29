@@ -38,7 +38,7 @@ export const Route = createFileRoute("/onboarding")({
 });
 
 function Onboarding() {
-  const { user, profile, lang, setLang, refreshProfile, loading } = useAuth();
+  const { user, profile, lang, refreshProfile, loading } = useAuth();
   const nav = useNavigate();
   const [name, setName] = useState("");
   const [craft, setCraft] = useState("");
