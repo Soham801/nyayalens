@@ -121,8 +121,9 @@ Deno.serve(async (req) => {
         similarityScore,
         aiReasoning,
         language,
+        languageName,
       } = payload;
-      const langName = language === "hi" ? "Hindi (Devanagari script)" : "English";
+      const langName = languageName || (language === "hi" ? "Hindi (Devanagari script)" : "English");
       const complaint = await callGemini(
         [
           {
