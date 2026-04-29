@@ -16,7 +16,7 @@ import {
   Download,
   Share2,
 } from "lucide-react";
-import { t } from "@/lib/i18n";
+import { t, languageFullName } from "@/lib/i18n";
 import { formatDate } from "@/lib/utils-app";
 import { generateComplaintPdf } from "@/lib/pdf";
 
@@ -73,19 +73,18 @@ function ScanPage() {
 
   const submit = async () => {
     if (!user || !file) {
-      toast.error("Add an image to scan");
+      toast.error(t(lang, "needScanImage"));
       return;
     }
     if (works.length === 0) {
-      toast.error("Register at least one work first to compare against");
+      toast.error(t(lang, "needAtLeastOneWork"));
       return;
     }
     setBusy(true);
     setResult(null);
     setComplaintText(null);
     try {
-      // Upload scanned image
-      setStage("Uploading…");
+      setStage(t(lang, "uploading"));
       const ext = file.name.split(".").pop() || "jpg";
       const path = `${user.id}/scan_${Date.now()}.${ext}`;
       const { error: upErr } = await supabase.storage
@@ -95,8 +94,7 @@ function ScanPage() {
       const { data: pub } = supabase.storage.from("artisan-works").getPublicUrl(path);
       const scannedUrl = pub.publicUrl;
 
-      // Compare against each registered work; take the highest score (cap at 4 to keep it snappy)
-      setStage("Analyzing with AI…");
+      setStage(t(lang, "analyzing"));
       const candidates = works.slice(0, 4);
       let best: { work: Work; similarity: number; reasoning: string } | null = null;
 
@@ -143,7 +141,7 @@ function ScanPage() {
       });
     } catch (e: any) {
       console.error(e);
-      toast.error(e.message || "Scan failed");
+      toast.error(e.message || t(lang, "scanFailed"));
     } finally {
       setBusy(false);
       setStage("");
@@ -166,6 +164,7 @@ function ScanPage() {
             similarityScore: result.similarity,
             aiReasoning: result.reasoning,
             language: lang,
+            languageName: languageFullName(lang),
           },
         },
       });
@@ -187,10 +186,10 @@ function ScanPage() {
         .single();
       if (ce) throw ce;
       setComplaintId(comp.id);
-      toast.success("Complaint drafted");
+      toast.success(t(lang, "complaintDrafted"));
     } catch (e: any) {
       console.error(e);
-      toast.error(e.message || "Failed to generate complaint");
+      toast.error(e.message || t(lang, "complaintFailed"));
     } finally {
       setComplaintBusy(false);
     }
@@ -227,10 +226,7 @@ function ScanPage() {
 
         <div className="mb-6">
           <h1 className="font-serif text-4xl text-foreground">{t(lang, "scan")}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Upload an image — we'll compare it with your {works.length} registered work
-            {works.length === 1 ? "" : "s"}.
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">{t(lang, "scanSubtitle")}</p>
         </div>
 
         <div className="space-y-5 rounded-2xl border border-border bg-card p-6 shadow-card">
@@ -247,8 +243,8 @@ function ScanPage() {
               setPreview(null);
               setResult(null);
             }}
-            label="Upload suspect image"
-            hint="The one you think is a copy"
+            label={t(lang, "uploadSuspect")}
+            hint={t(lang, "suspectHint")}
           />
 
           <Button onClick={submit} disabled={busy || !file} size="lg" className="w-full">
@@ -259,7 +255,7 @@ function ScanPage() {
               </>
             ) : (
               <>
-                <Sparkles className="mr-2 h-4 w-4" /> Compare with my works
+                <Sparkles className="mr-2 h-4 w-4" /> {t(lang, "compareWithMyWorks")}
               </>
             )}
           </Button>
@@ -267,7 +263,7 @@ function ScanPage() {
 
         {result && (
           <div className="mt-6 space-y-4">
-            <ResultCard result={result} />
+            <ResultCard result={result} lang={lang} />
 
             {result.similarity >= THRESHOLD && result.bestWork && !complaintText && (
               <Button
@@ -316,7 +312,7 @@ function ScanPage() {
   );
 }
 
-function ResultCard({ result }: { result: ScanResult }) {
+function ResultCard({ result, lang }: { result: ScanResult; lang: import("@/lib/i18n").Lang }) {
   const high = result.similarity >= THRESHOLD;
   const tone = high ? "destructive" : "success";
   const Icon = high ? AlertTriangle : CheckCircle2;
@@ -330,14 +326,14 @@ function ResultCard({ result }: { result: ScanResult }) {
       <div className="flex items-center gap-2">
         <Icon className={`h-5 w-5 text-${tone}`} />
         <h3 className="font-serif text-2xl text-foreground">
-          {high ? "Potential Copy Detected" : "No Significant Match"}
+          {high ? t(lang, "potentialCopy") : t(lang, "noMatch")}
         </h3>
       </div>
 
       <div className="mt-4 flex items-end gap-4">
         <div>
           <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
-            Similarity
+            {t(lang, "similarity")}
           </div>
           <div
             className={`font-serif text-6xl ${high ? "text-destructive" : "text-success"}`}
@@ -354,7 +350,7 @@ function ResultCard({ result }: { result: ScanResult }) {
           </div>
           <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
             <span>0%</span>
-            <span>Threshold {THRESHOLD}%</span>
+            <span>{t(lang, "threshold")} {THRESHOLD}%</span>
             <span>100%</span>
           </div>
         </div>
@@ -362,9 +358,9 @@ function ResultCard({ result }: { result: ScanResult }) {
 
       {result.bestWork && (
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          <Thumb label="Suspect image" url={result.scannedUrl} />
+          <Thumb label={t(lang, "suspectImage")} url={result.scannedUrl} />
           <Thumb
-            label={`Your work · ${result.bestWork.certificate_id}`}
+            label={`${t(lang, "yourWork")} · ${result.bestWork.certificate_id}`}
             url={result.bestWork.image_url}
             title={result.bestWork.title}
             date={formatDate(result.bestWork.created_at)}
@@ -375,7 +371,7 @@ function ResultCard({ result }: { result: ScanResult }) {
       {result.reasoning && (
         <div className="mt-4 rounded-lg bg-card/80 p-4">
           <div className="mb-1 flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-primary">
-            <Sparkles className="h-3 w-3" /> AI Reasoning
+            <Sparkles className="h-3 w-3" /> {t(lang, "aiReasoning")}
           </div>
           <p className="text-sm leading-relaxed text-foreground">{result.reasoning}</p>
         </div>
